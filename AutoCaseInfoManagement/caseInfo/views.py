@@ -13,47 +13,37 @@ responses = {"code": 0, "errorCode": 0, "msg": "请求成功"}
 
 class CaseInfoClass(APIView):
     def get(self, request):
-        queryset = CaseInfo.objects.select_related('group').all()
-        page = PageNumberPagination()
-        page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
-        serializer = CaseInfoSerializer(instance=page_roles, many=True)
-        # return Response(serializer.data)
-        return page.get_paginated_response(serializer.data)  # 使用分页返回对象，自带更详细的返回信息
+        groupName = request.GET.get('groupName')
+        status = request.GET.get('status')
 
+        if groupName or status:
+            if groupName and status:
+                queryset = CaseInfo.objects.select_related('group').filter(status=status, group__groupName=groupName)
+                page = PageNumberPagination()
+                page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
+                serializer = CaseInfoSerializer(instance=page_roles, many=True)
+                return page.get_paginated_response(serializer.data)
 
-@api_view(['GET'])
-def getPage(request):
-    platformName = request.GET.get('platformName')
-    status = request.GET.get('status')
+            elif groupName:
+                queryset = CaseInfo.objects.select_related('group').filter(group__groupName=groupName)
+                page = PageNumberPagination()
+                page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
+                serializer = CaseInfoSerializer(instance=page_roles, many=True)
+                return page.get_paginated_response(serializer.data)
 
-    if platformName or status:
-        if platformName and status:
-            queryset = CaseInfo.objects.select_related('group').filter('status', 'group__platformName')
+            elif status:
+                queryset = CaseInfo.objects.select_related('group').filter(status=status)
+                page = PageNumberPagination()
+                page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
+                serializer = CaseInfoSerializer(instance=page_roles, many=True)
+                return page.get_paginated_response(serializer.data)
+
+        else:
+            queryset = CaseInfo.objects.select_related('group').all()
             page = PageNumberPagination()
-            page_roles = page.paginate_queryset(queryset=queryset, request=request, view=getPage)
+            page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
             serializer = CaseInfoSerializer(instance=page_roles, many=True)
             return page.get_paginated_response(serializer.data)
-
-        elif platformName:
-            queryset = CaseInfo.objects.select_related('group').filter('group__platformName')
-            page = PageNumberPagination()
-            page_roles = page.paginate_queryset(queryset=queryset, request=request, view=getPage)
-            serializer = CaseInfoSerializer(instance=page_roles, many=True)
-            return page.get_paginated_response(serializer.data)
-
-        elif status:
-            queryset = CaseInfo.objects.select_related('group').filter('status')
-            page = PageNumberPagination()
-            page_roles = page.paginate_queryset(queryset=queryset, request=request, view=getPage)
-            serializer = CaseInfoSerializer(instance=page_roles, many=True)
-            return page.get_paginated_response(serializer.data)
-
-    else:
-        queryset = CaseInfo.objects.select_related('group').all()
-        page = PageNumberPagination()
-        page_roles = page.paginate_queryset(queryset=queryset, request=request, view=getPage)
-        serializer = CaseInfoSerializer(instance=page_roles, many=True)
-        return page.get_paginated_response(serializer.data)
 
 
 @api_view(['POST'])
@@ -74,6 +64,6 @@ def editStatus(request):
 def delCaseInfo(request):
     if request.method == 'GET':
         get_id = request.GET.get('id')
-        CaseInfo.objects.get(id=get_id).delete()
+        CaseInfo.objects.get(id=get_id).update(is_deleted=1)
         return Response(responses, status.HTTP_200_OK)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

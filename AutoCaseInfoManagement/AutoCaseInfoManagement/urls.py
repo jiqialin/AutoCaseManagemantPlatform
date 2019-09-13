@@ -24,7 +24,7 @@ schema_view = get_swagger_view(title='Auto Case Info Management APIs')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'docs/', schema_view),
-    path(r'index/', include('index.urls'), name='index'),
+    path('', include('index.urls'), name='index'),
     path(r'group/', include('group.urls')),
     path(r'caseInfo/', include('caseInfo.urls')),
     path(r'configuration/', include('configuration.urls')),

@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Department(models.Model):
-    departmentId = models.AutoField("id", primary_key=True)
+    id = models.AutoField("id", primary_key=True)
     name = models.CharField("部门名", max_length=50, null=True)
     create_time = models.DateTimeField(null=True, verbose_name='创建时间', auto_now_add=True)
     modify_time = models.DateTimeField(null=True, verbose_name='修改时间', auto_now=True)
@@ -18,7 +18,7 @@ class Department(models.Model):
 
 
 class BusinessLine(models.Model):
-    businessId = models.AutoField("id", primary_key=True)
+    id = models.AutoField("id", primary_key=True)
     lineName = models.CharField('业务线名', max_length=50, null=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     create_time = models.DateTimeField(null=True, verbose_name='创建时间', auto_now_add=True)
@@ -33,7 +33,7 @@ class BusinessLine(models.Model):
 
 
 class Group(models.Model):
-    groupId = models.AutoField("id", primary_key=True)
+    id = models.AutoField("id", primary_key=True)
     groupName = models.CharField('垂直小组名', max_length=50, null=True)
     businessLine = models.ForeignKey(BusinessLine, on_delete=models.CASCADE)
     create_time = models.DateTimeField(null=True, verbose_name='创建时间', auto_now_add=True)
@@ -49,7 +49,7 @@ class Group(models.Model):
 
 
 class Config(models.Model):
-    configId = models.AutoField('id', primary_key=True)
+    id = models.AutoField('id', primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     moduleName = models.CharField('模块名称', max_length=20, null=True)
     gitAddress = models.URLField('git地址', null=True)
@@ -65,11 +65,11 @@ class Config(models.Model):
 
     class Meta:
         verbose_name = "配置信息"
-        db_table = 'config'
+        db_table = 'git_config'
 
 
 class CaseInfo(models.Model):
-    caseId = models.AutoField('id', primary_key=True)
+    id = models.AutoField('id', primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     moduleName = models.CharField('模块名称', max_length=20, null=True)
     caseName = models.CharField('用例名称', max_length=50, null=True)
@@ -87,3 +87,5 @@ class CaseInfo(models.Model):
     class Meta:
         verbose_name = "用例信息"
         db_table = 'case_info'
+
+

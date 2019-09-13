@@ -23,7 +23,6 @@ class ConfigClass(APIView):
         page = PageNumberPagination()
         page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
         serializer = ConfigurationSerializer(instance=page_roles, many=True)
-
         return page.get_paginated_response(serializer.data)
 
     def post(self, request):

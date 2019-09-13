@@ -20,7 +20,6 @@ from . import views
 
 urlpatterns = [
     path('', views.CaseInfoClass.as_view(), name='caseInfo'),
-    path('api/getPage/', views.getPage, name='getPage'),
     path('api/editStatus/', views.editStatus, name='editStatus'),
     path('api/delCaseInfo/', views.delCaseInfo, name='delCaseInfo'),
 
