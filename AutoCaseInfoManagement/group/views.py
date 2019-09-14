@@ -12,9 +12,9 @@ from .serializer import GroupSerializer
 
 
 @api_view(['GET'])
-def groupIndex(request):
+def groupInfo(request):
     queryset = Group.objects.all()
     page = PageNumberPagination()
-    page_roles = page.paginate_queryset(queryset=queryset, request=request, view=groupIndex)
+    page_roles = page.paginate_queryset(queryset=queryset, request=request, view=groupInfo)
     serializer = GroupSerializer(instance=page_roles, many=True)
     return page.get_paginated_response(serializer.data)

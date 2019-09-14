@@ -46,24 +46,18 @@ class CaseInfoClass(APIView):
             return page.get_paginated_response(serializer.data)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def editStatus(request):
-    if request.method == 'POST':
-        get_id = request.POST.get('id')
-        obj = request.POST.get('status')
-        queryset = CaseInfo.objects.filter(id=get_id).update(status=obj)
-        serializer = CaseInfoSerializer(instance=queryset, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(responses, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
-    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+    get_id = request.GET.get('id')
+    obj = request.GET.get('status')
+    CaseInfo.objects.filter(id=get_id).update(status=obj)
+    return Response(responses, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
 def delCaseInfo(request):
     if request.method == 'GET':
         get_id = request.GET.get('id')
-        CaseInfo.objects.get(id=get_id).update(is_deleted=1)
+        CaseInfo.objects.filter(id=get_id).update(is_deleted=1)
         return Response(responses, status.HTTP_200_OK)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

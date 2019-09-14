@@ -15,6 +15,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 class ConfigClass(APIView):
     responses = {"code": 0, "errorCode": 0, "msg": "请求成功"}
+    errors = {"code": 1, "errorCode": 1, "msg": "未找到更新的记录ID"}
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = []
 
@@ -28,7 +29,9 @@ class ConfigClass(APIView):
     def post(self, request):
         get_id = request.GET.get('id')
         if get_id:
-            queryset = Config.objects.get(id=get_id)
+            queryset = Config.objects.filter(id=get_id).first()
+            if not queryset:
+                return Response(self.errors, status=status.HTTP_400_BAD_REQUEST)
             serializer = ConfigurationSerializer(instance=queryset, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -51,7 +54,7 @@ class ConfigClass(APIView):
 @permission_classes([AllowAny, ])
 def getGroupInfo(request):
     response = dict()
-    queryset = Group.objects.values('id', 'name').order_by('id').all()
+    queryset = Group.objects.values('id', 'groupName').order_by('-id').all()
     serializer = GroupSerializer(instance=queryset, many=True)
     response['group'] = serializer.data
     return Response(response, status=status.HTTP_200_OK)

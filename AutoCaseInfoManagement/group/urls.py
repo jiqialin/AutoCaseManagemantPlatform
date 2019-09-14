@@ -19,6 +19,6 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.groupIndex, name='groupIndex'),
+    path('', views.groupInfo, name='groupInfo'),
 
 ]
