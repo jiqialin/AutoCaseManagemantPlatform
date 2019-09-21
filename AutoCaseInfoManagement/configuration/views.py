@@ -1,5 +1,5 @@
 from index.models import Config, Group
-from .serializers import ConfigurationSerializer, GroupSerializer
+from .serializers import ConfigurationSerializer, GroupSerializer, ConfigSearchSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -20,10 +20,10 @@ class ConfigClass(APIView):
     permission_classes = []
 
     def get(self, request):
-        queryset = Config.objects.select_related('group').all()
+        queryset = Config.objects.select_related('group').all().order_by('-id')
         page = PageNumberPagination()
         page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
-        serializer = ConfigurationSerializer(instance=page_roles, many=True)
+        serializer = ConfigSearchSerializer(instance=page_roles, many=True)
         return page.get_paginated_response(serializer.data)
 
     def post(self, request):
