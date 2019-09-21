@@ -14,32 +14,32 @@ responses = {"code": 0, "errorCode": 0, "msg": "请求成功"}
 class CaseInfoClass(APIView):
     def get(self, request):
         groupName = request.GET.get('groupName')
-        status = request.GET.get('status')
+        case_status = request.GET.get('status')
 
-        if groupName or status:
-            if groupName and status:
-                queryset = CaseInfo.objects.select_related('group').filter(status=status, group__groupName=groupName)
+        if groupName or case_status:
+            if groupName and case_status:
+                queryset = CaseInfo.objects.select_related('group').filter(status=status, group__groupName=groupName).order_by('-id')
                 page = PageNumberPagination()
                 page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
                 serializer = CaseInfoSerializer(instance=page_roles, many=True)
                 return page.get_paginated_response(serializer.data)
 
             elif groupName:
-                queryset = CaseInfo.objects.select_related('group').filter(group__groupName=groupName)
+                queryset = CaseInfo.objects.select_related('group').filter(group__groupName=groupName).order_by('-id')
                 page = PageNumberPagination()
                 page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
                 serializer = CaseInfoSerializer(instance=page_roles, many=True)
                 return page.get_paginated_response(serializer.data)
 
-            elif status:
-                queryset = CaseInfo.objects.select_related('group').filter(status=status)
+            elif case_status:
+                queryset = CaseInfo.objects.select_related('group').filter(status=status).order_by('-id')
                 page = PageNumberPagination()
                 page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
                 serializer = CaseInfoSerializer(instance=page_roles, many=True)
                 return page.get_paginated_response(serializer.data)
 
         else:
-            queryset = CaseInfo.objects.select_related('group').all()
+            queryset = CaseInfo.objects.select_related('group').all().order_by('-id')
             page = PageNumberPagination()
             page_roles = page.paginate_queryset(queryset=queryset, request=request, view=self)
             serializer = CaseInfoSerializer(instance=page_roles, many=True)
@@ -56,8 +56,7 @@ def editStatus(request):
 
 @api_view(['GET'])
 def delCaseInfo(request):
-    if request.method == 'GET':
-        get_id = request.GET.get('id')
-        CaseInfo.objects.filter(id=get_id).update(is_deleted=1)
-        return Response(responses, status.HTTP_200_OK)
-    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+    get_id = request.GET.get('id')
+    CaseInfo.objects.filter(id=get_id).update(is_deleted=1)
+    return Response(responses, status.HTTP_200_OK)
+
