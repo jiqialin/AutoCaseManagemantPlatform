@@ -1,10 +1,9 @@
 
 from rest_framework.response import Response
-from rest_framework import status
 import demjson
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
-
+from rest_framework.renderers import *
 
 # Create your views here.
 
@@ -18,3 +17,4 @@ def index(request):
         data = {'title': 'Welcome to Auto Case Info Management Platform .', 'user': 'Anonymous access'}
     response = demjson.encode(data)
     return Response(response, status=status.HTTP_202_ACCEPTED)
+
