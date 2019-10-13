@@ -8,14 +8,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
-
+import demjson, json
 
 # Create your views here.
 
 
 class ConfigClass(APIView):
     responses = {"code": 0, "errorCode": 0, "msg": "请求成功"}
-    errors = {"code": 1, "errorCode": 1, "msg": "未找到更新的记录ID"}
+    errors = {"code": 1, "errorCode": 1, "msg": "Error"}
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = []
 
@@ -28,20 +28,31 @@ class ConfigClass(APIView):
 
     def post(self, request):
         get_id = request.GET.get('id')
+        git_address = demjson.decode(request.body).get('gitAddress')
+
+        if not git_address.startswith('http') or not git_address.endswith('.git'):
+            self.errors['msg'] = 'git address formal error !'
+            return Response(self.errors)
+
         if get_id:
             queryset = Config.objects.filter(id=get_id).first()
             if not queryset:
+                self.errors['msg'] = 'unknown ID !'
                 return Response(self.errors, status=status.HTTP_400_BAD_REQUEST)
+
             serializer = ConfigurationSerializer(instance=queryset, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(self.responses, status=status.HTTP_200_OK)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         else:
             serializer = ConfigurationSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(self.responses, status=status.HTTP_200_OK)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
@@ -58,3 +69,5 @@ def getGroupInfo(request):
     serializer = GroupSerializer(instance=queryset, many=True)
     response['group'] = serializer.data
     return Response(response, status=status.HTTP_200_OK)
+
+

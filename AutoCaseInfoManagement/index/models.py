@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 
@@ -66,14 +67,44 @@ class Config(BaseModelTable):
         db_table = 'git_config'
 
 
+from django.db import connection
+
+
+class BusinessManager(models.Manager):
+    """
+        测试用例管理器
+        过滤状态为 0 启用的用例信息展示
+    """
+    id = 1
+    status = 0
+
+    def get_queryset(self):
+        return super(BusinessManager, self).get_queryset().filter(status=0)
+
+    def ownCustomSql(self):
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE case_info SET status = 1 WHERE id = %s", [self.id, ])
+            cursor.execute("SELECT * FROM case_info WHERE status = %s", [self.status, ])
+            row = cursor.fetchone()
+        return row
+
+
 class CaseInfo(BaseModelTable):
+    STATUS_CHOICES = [(0, '正常'), (1, '废弃'), ]
+
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     moduleName = models.CharField('模块名称', max_length=20, null=True)
     caseName = models.CharField('用例名称', max_length=50, null=True)
     caseType = models.IntegerField('用例类型')
-    status = models.IntegerField('状态：0 正常，1 废弃', default=0)
+    status = models.IntegerField('状态', choices=STATUS_CHOICES, default=0)
     casePath = models.CharField('用例路径', max_length=50, null=True)
     modifier = models.CharField('修改人', max_length=20, null=True)
+    apiName = models.CharField('接口名称', max_length=50, null=True)
+    excelId = models.IntegerField(null=True)
+    serverName = models.CharField('服务名', max_length=50, null=True)
+
+    objects = models.Manager()
+    businessData = BusinessManager()
 
     def __str__(self):
         return self.caseName
@@ -81,5 +112,9 @@ class CaseInfo(BaseModelTable):
     class Meta:
         verbose_name = "用例信息"
         db_table = 'case_info'
+
+
+
+
 
 

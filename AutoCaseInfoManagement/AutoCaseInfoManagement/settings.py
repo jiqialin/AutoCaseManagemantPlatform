@@ -145,12 +145,12 @@ SWAGGER_SETTINGS = {
             'type': 'basic'
         }
     },
-    # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
+    # 如果需要登录才能够查看接口文档, 登录的链接使用 rest framework 自带的.
     # 'LOGIN_URL': 'rest_framework:login',
     # 'LOGOUT_URL': 'rest_framework:logout',
-    # 'DOC_EXPANSION': None,
-    # 'SHOW_REQUEST_HEADERS':True,
-    # 'USE_SESSION_AUTH': True,
+    'DOC_EXPANSION': None,
+    'SHOW_REQUEST_HEADERS': True,
+    'USE_SESSION_AUTH': True,
     # 'DOC_EXPANSION': 'list',
     # 接口文档中方法列表以首字母升序排列
     'APIS_SORTER': 'alpha',
